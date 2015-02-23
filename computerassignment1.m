@@ -9,7 +9,7 @@ Rxx = rho.^abs(l);
 w = -pi:0.005*pi:pi;
 
 sigma_x = 1;
-Sxx = (1-rho^2)./((1-rho*exp(-1i.*w)).*(1-rho*exp(1i.*w)));
+Sxx = sigma_x./(1-rho*exp(-1i.*w));
 %figure;
 v = -3:6/(length(Sxx)-1):3;
 %plot(v,abs(Sxx)),title('Power Spectral Density of Gaussian AR(1)-process'),xlabel('w'),ylabel('Sxx');
@@ -17,18 +17,12 @@ v = -3:6/(length(Sxx)-1):3;
 
 n = 0:1:N;
 rxx = 0;
-%sxx2 = 0;
-%xTot = 0;
 avgN = 1000;
 for i = 1:avgN
     e = sqrt(1-rho^2)*randn(1,N);
     x = filter(1,[1 -rho],e);
-    %xTot = xTot + x;
     rxx = rxx+ xcorr(x, 'coeff');
-    %sxx2 = sxx2 + (1/N)*(fft(x)).^2;
 end
-%sxx2 = sxx2*(1/avgN);
-%rxx2 = xcorr(xTot);
 rxx = rxx*(1/avgN);
 l1 = -(N-1):1:N-1;
 
