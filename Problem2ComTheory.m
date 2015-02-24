@@ -29,7 +29,7 @@ for k = 1:length(bitrate)
     %Sqy = sigma_q*(0.998.*f(freq).^(0.5)-0.00139);
     %Sxy = 
     %figure(2+k);
-    text = sprintf('Bit-rate: %g', bitrate(k));
+    text = sprintf('Power spectral density of signal(blue) and noise(red) for bit-rate: %g', bitrate(k));
     subplot(3,3,3*k);
     semilogy(freq, Sqy, 'r'), title(text);
     hold on 
@@ -49,8 +49,8 @@ for k = 1:length(bitrate)
     titleFSMH = sprintf('Fourier transformed of FSM of |H(f)|^2 for bit-rate = %g',bitrate(k)); 
 
     figure(10);
-    subplot(length(bitrate),1,k),stem(FSMG_fft),title(titleFSMG);
+    subplot(1,length(bitrate),k),stem(abs(FSMG_fft)),title(titleFSMG);
     figure(11);
-    subplot(length(bitrate),1,k),stem(FSMH_fft),title(titleFSMH);
+    subplot(1,length(bitrate),k),stem(abs(FSMH_fft)),title(titleFSMH);
     
 end
