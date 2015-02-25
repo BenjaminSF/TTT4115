@@ -29,11 +29,12 @@ for k = 1:length(bitrate)
 
     
     text = sprintf('Power spectral density of signal(blue) and noise(red) for bit-rate: %g', bitrate(k));
+    figure(1);
     subplot(3,3,3*k);
     semilogy(freq, Sqy, 'r'), title(text); %Plotting the power spectral density of the noise in log-plot
     hold on 
     semilogy(freq,Sxy, 'b'); %Plotting the power spectral density of the signal in log-plot (In the same plot as the corresponding noise
-
+    hold off
     SNR = 10*log10( sum(Sxy)/sum(Sqy) ); %Computing signal-to-nois ratio
     fprintf('SNR: %3.4g, %g bit-rate.\n', SNR, bitrate(k));
     %Problem 2b
@@ -47,9 +48,39 @@ for k = 1:length(bitrate)
     titleFSMG = sprintf('Fourier transformed of FSM of |G(f)|^2 for bit-rate = %g',bitrate(k));
     titleFSMH = sprintf('Fourier transformed of FSM of |H(f)|^2 for bit-rate = %g',bitrate(k)); 
 
+    figure(2);
+    subplot(1,length(bitrate),k),plot(freq,abs(FSMG_fft)),title(titleFSMG);
+    hold on
+    subplot(1,length(bitrate),k),plot(freq,[G(51:end) G(1:50)])
+    figure(3);
+    subplot(1,length(bitrate),k),stem(freq,abs(FSMH_fft)),title(titleFSMH);
+    hold on
+    subplot(1,length(bitrate),k),plot(freq,[H(51:end) H(1:50)]);
+    FSMG_fft = FSMG_fft';
+    FSMH_fft = FSMH_fft';
+    
+    filterEstimate = [FSMG_fft(52:end) FSMG_fft(1:51)].*[FSMH_fft(52:end) FSMH_fft(1:51)];
+    filterTheory = H.*G;
+    titleHGestimate = sprintf('Estimated H(f) and G(f) in cascade for bit-rate = %g',bitrate(k));
+    titleHGtheory = sprintf('Theoretical H(f) and G(f) in cascade for bit-rate = %g',bitrate(k));
+    figure(5+k);
+    subplot(1,2,1),plot(freq,abs(filterEstimate)),title(titleHGestimate);
+    figure(5+k);
+    subplot(1,2,2),plot(freq,abs(filterTheory)),title(titleHGtheory);
+    
+    error = abs(filterTheory)-abs(filterEstimate);
     figure(10);
-    subplot(1,length(bitrate),k),stem(abs(FSMG_fft)),title(titleFSMG);
-    figure(11);
-    subplot(1,length(bitrate),k),stem(abs(FSMH_fft)),title(titleFSMH);
+    plot(freq,error);
+    %Problem 2c
+   
+    x = ARprocess(10000);
+    
+    u = conv(x,FSMG);
+    
+    step = sqrt(12* sigma_q^2);
+    
+    uQuant = quantize(u,step);
+    figure(15);
+    hist(uQuant,step);
     
 end
