@@ -16,7 +16,7 @@ for i = 1:8
             s(j,:) = nuller;
         end
     end
-    x(i,:) = TFB(s(1),s(2),s(3),s(4),s(5),s(6),s(7),s(8),k);
+    x(i,:) = TFB(s(1,:),s(2,:),s(3,:),s(4,:),s(5,:),s(6,:),s(7,:),s(8,:),k);
     figure(1);
     subplot(4,2,i),plot(abs(x(i,:)));
 
@@ -46,12 +46,12 @@ hold off;
 
 %% Problem 2
 
-h = [0.3336, 0.2975, 0.1328, 0.0729,0.0389,0.0274,0.0172,0.014,0.0098,0.0087,0.0064,0.0061,0.0047,0.0048,0.0037,0.0042,0.0029,0.0046,0.001,0.0086];
-%2a
+c = [0.3336, 0.2975, 0.1328, 0.0729,0.0389,0.0274,0.0172,0.014,0.0098,0.0087,0.0064,0.0061,0.0047,0.0048,0.0037,0.0042,0.0029,0.0046,0.001,0.0086];
+% 2a
 y = [];
 Y = [];
 for i = 1:8
-    y(i,:) = filter(h,1,x(i,:));
+    y(i,:) = filter(c,1,x(i,:));
     Y(i,:) =fft(y(i,:));
     figure(6);
     subplot(4,2,i),plot(abs(Y(i,:)));
@@ -61,26 +61,50 @@ for i = 1:8
 
 end
 hold off;
-z = filter(h,1,ener);
+z = filter(c,1,ener);
 Z = fft(z);
 figure(8);
 subplot(2,1,1),plot(z);
 subplot(2,1,2),plot(abs(Z));
-%2b
+% 2b
 u = zeros(8,100);
-v = zeros(8,100);
+
 for i = 1:8
-    [u(1),u(2),u(3),u(4),u(5),u(6),u(7),u(8)] = RFB(y(i,:),k);
+    [u(1,:),u(2,:),u(3,:),u(4,:),u(5,:),u(6,:),u(7,:),u(8,:)] = RFB(y(i,:),k);
     for j = 1:8
         figure(9+i);
-        subplot(4,2,j),stem(u(j,:));
+        if j == i
+            subplot(4,2,j),stem(u(j,:), 'r');
+        else
+            subplot(4,2,j),stem(u(j,:), 'b');
+        end
     end
-    for j = 1:8
-        v(j) = filter(1,h,u(j));
-        figure(19+i);
-        subplot(4,2,j),stem(v(j,:));
-    end
-    
+
 end
 
+% 2c
+h1 = dfilt.df2t(c,1);
+h2 = dfilt.df2t(1,c);
+hCas = dfilt.cascade(h1,h2);
+figure(31);
+freqz(hCas);
 
+figure(30);
+zplane(c,1);
+title('Minimum-phase filter because all zeros are inside the unit circle');
+
+% 2d
+y_filt = [];
+v = zeros(8,100);
+for i = 1:8
+    y_filt(i,:) = filter(1,c,y(i,:));
+    [v(1,:),v(2,:),v(3,:),v(4,:),v(5,:),v(6,:),v(7,:),v(8,:)] = RFB(y_filt(i,:),k);
+    for j = 1:8
+        figure(19+i);
+        if j == i
+            subplot(4,2,j),stem(v(j,:), 'r');
+        else
+            subplot(4,2,j),stem(v(j,:), 'b');
+        end
+    end
+end
