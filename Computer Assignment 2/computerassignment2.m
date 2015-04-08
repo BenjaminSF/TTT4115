@@ -129,3 +129,19 @@ for i = 1:8
     end
 end
 
+% 2f
+sSin = sin(0.2:0.2:20);
+uSin = zeros(8,100);
+
+xSin = TFB(nuller, sSin, nuller, nuller, nuller, nuller, nuller, nuller, k);
+ySin = filter(c,1,xSin);
+%ySin_filt = filter(1,c,ySin);
+[uSin(1,:),uSin(2,:),uSin(3,:),uSin(4,:),uSin(5,:),uSin(6,:),uSin(7,:),uSin(8,:)] = RFB(ySin, k);
+figure(50);
+for i = 1:8
+    if i == 2
+        subplot(4,2,i), stem(uSin(i,:), 'r');
+    else
+        subplot(4,2,i), stem(uSin(i,:), 'b');
+    end
+end
