@@ -119,14 +119,14 @@ vn = zeros(8,100);
 for i = 1:8
     y_wgn_filt(i,:) = filter(1,c,y_wgn(i,:));
     [vn(1,:),vn(2,:),vn(3,:),vn(4,:),vn(5,:),vn(6,:),vn(7,:),vn(8,:)] = RFB(y_wgn_filt(i,:),k);
-    for j = 1:8
-        figure(39+i);
-        if j == i
-            subplot(4,2,j),stem(vn(j,:), 'r');
-        else
-            subplot(4,2,j),stem(vn(j,:), 'b');
-        end
-    end
+%     for j = 1:8
+%         figure(39+i);
+%         if j == i
+%             subplot(4,2,j),stem(vn(j,:), 'r');
+%         else
+%             subplot(4,2,j),stem(vn(j,:), 'b');
+%         end
+%     end
 end
 
 % 2f
@@ -145,3 +145,47 @@ for i = 1:8
         subplot(4,2,i), stem(uSin(i,:), 'b');
     end
 end
+
+%% Problem 3
+% 3a
+theta = 0:0.1:100;
+[Yrow, Ycol] = size(Y);
+centerFreq = zeros(1,8);
+for i = 1:8
+    temp = abs(Y(i,1:ceil(Ycol/2)));
+    centerFreq(i) = find(temp == max(temp), 1, 'first');
+end
+centerFreq = pi .* centerFreq ./ Ycol;
+chanAmp = zeros(1,8);
+[ampH1, wH1] = freqz(h1);
+
+C = zeros(8,length(theta));
+L = zeros(8,length(theta));
+
+for i = 1:8
+    tmpPos = find(wH1 >= centerFreq(i), 1, 'first');
+    chanAmp(i) = (abs(ampH1(tmpPos)))^2;
+    C(i,:) = 0.5 * log2(theta * chanAmp(i));  
+end
+L = round(2.^C);
+%figure(301);
+for i = 1:8
+    figure(302);
+    subplot(4,2,i), plot(theta, C(i,:));
+    figure(301);
+    subplot(4,2,i), plot(theta, L(i,:));
+end
+% Ltot = sum(L,1);
+% figure(303);
+% plot(theta, Ltot);
+
+% 3b
+S_x = zeros(8,length(theta));
+for i = 1:8
+    S_x(i,:) = theta - 1/chanAmp(i);
+end
+figure(311);
+for i = 1:8
+    subplot(4,2,i), plot(theta, S_x(i,:), 'b', theta, zeros(length(theta)), 'r');
+end
+
