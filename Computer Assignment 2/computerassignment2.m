@@ -71,14 +71,14 @@ u = zeros(8,100);
 
 for i = 1:8
     [u(1,:),u(2,:),u(3,:),u(4,:),u(5,:),u(6,:),u(7,:),u(8,:)] = RFB(y(i,:),k);
-    for j = 1:8
-        figure(9+i);
-        if j == i
-            subplot(4,2,j),stem(u(j,:), 'r');
-        else
-            subplot(4,2,j),stem(u(j,:), 'b');
-        end
-    end
+%     for j = 1:8
+%         figure(9+i);
+%         if j == i
+%             subplot(4,2,j),stem(u(j,:), 'r');
+%         else
+%             subplot(4,2,j),stem(u(j,:), 'b');
+%         end
+%     end
 
 end
 
@@ -86,12 +86,14 @@ end
 h1 = dfilt.df2t(c,1);
 h2 = dfilt.df2t(1,c);
 hCas = dfilt.cascade(h1,h2);
-figure(31);
 freqz(hCas);
+checkString = char('is not', 'is');
+%fprintf('The cascade %s an all-pass filter\n', checkString(1+ isallpass(hCas),:));
 
 figure(30);
 zplane(c,1);
 title('Minimum-phase filter because all zeros are inside the unit circle');
+fprintf('The filter %s a min-phase filter\n', strtrim(checkString(1+ isminphase(h1),:)));
 
 % 2d
 y_filt = [];
@@ -99,12 +101,31 @@ v = zeros(8,100);
 for i = 1:8
     y_filt(i,:) = filter(1,c,y(i,:));
     [v(1,:),v(2,:),v(3,:),v(4,:),v(5,:),v(6,:),v(7,:),v(8,:)] = RFB(y_filt(i,:),k);
+%     for j = 1:8
+%         figure(19+i);
+%         if j == i
+%             subplot(4,2,j),stem(v(j,:), 'r');
+%         else
+%             subplot(4,2,j),stem(v(j,:), 'b');
+%         end
+%     end
+end
+
+% 2e
+wgn = 0.01 .* randn(size(y));
+y_wgn = y + wgn;
+y_wgn_filt = [];
+vn = zeros(8,100);
+for i = 1:8
+    y_wgn_filt(i,:) = filter(1,c,y_wgn(i,:));
+    [vn(1,:),vn(2,:),vn(3,:),vn(4,:),vn(5,:),vn(6,:),vn(7,:),vn(8,:)] = RFB(y_wgn_filt(i,:),k);
     for j = 1:8
-        figure(19+i);
+        figure(39+i);
         if j == i
-            subplot(4,2,j),stem(v(j,:), 'r');
+            subplot(4,2,j),stem(vn(j,:), 'r');
         else
-            subplot(4,2,j),stem(v(j,:), 'b');
+            subplot(4,2,j),stem(vn(j,:), 'b');
         end
     end
 end
+
